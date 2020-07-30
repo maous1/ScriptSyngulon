@@ -23,7 +23,10 @@ dir.create("03-genome/")
 dl.annot.genome(species = species,NmaxPlasmid = 1000,annotationDir = "02-annotation/",genomeDir = "03-genome/",accessionDir = "01-accession-list/")
 
 
-
+######extract sequences from annotation
+species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species = species$Organism[species$n>20]
+extract.sequences.annotation(species = species,annotationDir = "02-annotation/",genomeDir = "03-genome/",outDir = "05-extracted-sequences-from-annotation/")
 
 ############screenblast sur les génomes
 
