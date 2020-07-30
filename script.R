@@ -3,54 +3,24 @@ system2(command='conda',args = 'list')
 
 library(dplyr)
 library(Biostrings)
-library(syngulon2)
+library(syngulon)
 
 
-species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
-species = species$Organism[species$n>20]
-species2 = gsub("_"," ",species)
-dir.create("01-accession-list")
+
 
 
 ####### download accession list
-for (i in 1:length(species)) {
-  
-  demo.search <- esearch(term = paste0(species2[i],"[orgn] and plasmid[title]"), db = 'nuccore', usehistory = TRUE) #search
-  accessions <- efetch(demo.search, rettype = "acc",retmode = "text",outfile= paste0('01-accession-list/',species[i],".csv"))#fetch accessions
-  accession  <- read.csv(paste0('01-accession-list/',species[i],".csv"),header=F,stringsAsFactors = F) 
-  accession$V1 <- unlist(lapply(strsplit(accession$V1,split='\\.'),function(x) x[[1]]))
-  write.csv(accession,paste0('01-accession-list/',species[i],".csv"),row.names = F)
-  print(i)
-  
-}
+species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species = species$Organism[species$n>20]
+dir.create("01-accession-list/")
+download.accession.NCBI(species = species,title = "plasmid",accessionDir = "01-accession-list/")
 
 ###########Download genome et annotation
-nombre = 1000
-for (j in 1:length(species)) {
-  dir.create(paste0("02-annotation/",species[j]))
-  dir.create(paste0("03-genome/",species[j]))
-  accession <- read.csv(paste0('01-accession-list/',species[j],".csv"),stringsAsFactors = F)
-  accession  <- accession$V1
-  if (length(accession)>nombre) {
-    accession <- accession[sample(1:length(accession), nombre, replace=F)]
-  }
-  N.accession <- length(accession)
-  for(i in 1:N.accession)
-  {
-    seq <- try(read.GenBank(accession[i]),silent = T)
-    current.annotation <- try(getAnnotationsGenBank(access.nb=accession[i], quiet = TRUE))
-    if (class(seq)=="DNAbin" & class(current.annotation)=="data.frame"& (all(is.element(c('start','end','type','product'),colnames(current.annotation))))) {
-      write.FASTA(seq,paste0('03-genome/',species[j],"/",accession[i],'.fasta'))
-      seq <- readDNAStringSet(paste0('03-genome/',species[j],"/",accession[i],'.fasta'))
-      writeXStringSet(seq,paste0('03-genome/',species[j],"/",accession[i],'.fasta'))
-      current.annotation <- tibble(current.annotation)
-      current.annotation <- current.annotation %>% select(start,end,type,gene,product)
-      write.csv(current.annotation,paste0('02-annotation/',species[j],"/",accession[i],'.csv'),row.names = F)
-    }
-    
-    print(i)
-  }
-}
+species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species = species$Organism[species$n>20]
+dir.create("02-annotation/")
+dir.create("03-genome/")
+dl.annot.genome(species = species,NmaxPlasmid = 1000,annotationDir = "02-annotation/",genomeDir = "03-genome/",accessionDir = "01-accession-list/")
 
 
 
@@ -172,7 +142,7 @@ result.blast = read.csv("99-results/result.blast.csv",row.names = 1)
 result.blast = data.frame(result.blast)
 result.blast = filter_all(result.blast, any_vars(. !=""))
 presenceblast <- data.frame(apply(result.blast,2,function(x) as.numeric(x!='')))
-presenceblast$cna = rep(0,length(presenceblast$cna))
+presenceblast$cna = rep(0,length(presenceblast$cna))#probleme avec les cna donc mis tout a zero car il n'y en a pas
 rownames(presenceblast)=rownames(result.blast)
 library(gplots)
 matrix.to.plot <- as.matrix(presenceblast)
