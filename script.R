@@ -10,23 +10,24 @@ library(syngulon)
 
 
 ####### download accession list
-species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species= read.csv("/Key/01-selected.species/bacteria.n.csv")
 species = species$Organism[species$n>20]
 dir.create("01-accession-list/")
-download.accession.NCBI(species = species,title = "plasmid",accessionDir = "01-accession-list/")
+download.accession.NCBI(species = species,title = "plasmid",accessionDir = "01-accession-list/",index = 102)
 
 ###########Download genome et annotation
-species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species= read.csv("/Key/01-selected.species/bacteria.n.csv")
 species = species$Organism[species$n>20]
 dir.create("02-annotation/")
 dir.create("03-genome/")
-dl.annot.genome(species = species,NmaxPlasmid = 1000,annotationDir = "02-annotation/",genomeDir = "03-genome/",accessionDir = "01-accession-list/")
+dl.annot.genome(species = species,NmaxPlasmid = 1000,annotationDir = "02-annotation/",genomeDir = "03-genome/",accessionDir = "01-accession-list/",index=1)
 
 
 ######extract sequences from annotation
-species= read.csv("/media/jerome/Seagate Expansion Drive//Key/01-selected.species/bacteria.n.csv")
+species= read.csv("/Key/01-selected.species/bacteria.n.csv")
 species = species$Organism[species$n>20]
-extract.sequences.annotation(species = species,annotationDir = "02-annotation/",genomeDir = "03-genome/",outDir = "05-extracted-sequences-from-annotation/")
+dir.create("05-extracted-sequences-from-annotation/")
+currentannotationfull = extract.sequences.annotation(species = species,annotationDir = "02-annotation/",genomeDir = "03-genome/",outDir = "05-extracted-sequences-from-annotation/")
 
 ############screenblast sur les génomes
 
