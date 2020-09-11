@@ -140,7 +140,7 @@ otus(species = espece,collicin = collicin,geneDir = geneDir,outDir = outDir)
 
 #########plot otus phylo
 bacteria.table = read.csv("/Key/01-selected.species/bacteria.table.csv")
-phylo.from.otus(otusDir = "04-extracted-sequences-from-blast/",bacteria.table = bacteria.table)
+phylo.from.otus(otusDir = "09-otus/",bacteria.table = bacteria.table)
 
 
 
